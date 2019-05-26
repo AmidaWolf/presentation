@@ -1,0 +1,436 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Fonts Loading Strategy</title>
+
+  <meta name="description" content="Fonts Loading Strategy">
+  <meta name="author" content="Yauhen Varapayeu">
+
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/reveal.css">
+  <link rel="stylesheet" href="css/theme/black.css">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="lib/css/monokai.css">
+
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  </script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h1>Fonts Loading Strategy</h1>
+        <p>created by <a href="https://github.com/AmidaWolf">Yauhen Varapayeu</a></p>
+      </section>
+      <section>
+        <section>
+          <h2>Font loading problems</h2>
+          <ol>
+            <li>FOIT</li>
+            <li>FOUT</li>
+            <li>Content Shifting</li>
+          </ol>
+        </section>
+        <section>
+          <h2>FOIT</h2>
+          <p>Flash of Invisible Text</p>
+        </section>
+        <section>
+          <h2>FOUT</h2>
+          <p>Flash of Unstyled Text</p>
+        </section>
+        <section>
+          <h2>FOFT</h2>
+          <p>Flash of Faux Text</p>
+        </section>
+      </section>
+      <section>
+        <h2>Font loaing methods/strategies</h2>
+      </section>
+      <section>
+        <h2>Simple methods</h2>
+        <p>Based at @font-face with/without font-display</p>
+      </section>
+      <section>
+        <section>
+          <h2>font-display</h2>
+          <p>The font display timeline is based on a timer that begins the moment the user agent attempts to use a given downloaded
+          font face.</p>
+        </section>
+        <section>
+          <p>Three periods:</p>
+          <ul>
+            <li>Font block period</li>
+            <li>Font swap period</li>
+            <li>Font failure period</li>
+          </ul>
+        </section>
+        <section>
+          <h3>swap</h3>
+          <p>Gives the font face an extremely small block period and an infinite swap period</p>
+          <h3>optional</h3>
+          <p>Gives the font face an extremely small block period and no swap period</p>
+        </section>
+        <section>
+          <h3>font-display available</h3>
+          <img src="./CIU.png" alt="Can I Use It">
+        </section>
+        <section>
+          <p>For more information look at <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display">https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display</a> and <a href="https://developers.google.com/web/updates/2016/02/font-display">https://developers.google.com/web/updates/2016/02/font-display</a></p>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>Simple @font-face.</h2>
+          <pre style="white-space: pre-wrap;">
+							<code data-trim>
+								@font-face {
+									font-family: Lato;
+									src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+									url('font-lato/lato-regular-webfont.woff') format('woff');
+								}
+							</code>
+						</pre>
+        </section>
+        <section>
+          <h2>font-dispay: swap</h2>
+          <pre style="white-space: pre-wrap;">
+							<code data-trim>
+								@font-face {
+									font-family: Lato;
+									src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+									url('font-lato/lato-regular-webfont.woff') format('woff');
+									font-display: swap;
+								}
+								... and etc
+							</code>
+						</pre>
+        </section>
+        <section>
+          <h2>Preload</h2>
+          <pre style="white-space: pre-wrap;">
+							<code data-trim>
+								<link rel="preload" href="font-lato/lato-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
+							</code>
+						</pre>
+          <pre style="white-space: pre-wrap;">
+							<code data-trim>
+								@font-face {
+									font-family: Lato;
+									src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+									url('font-lato/lato-regular-webfont.woff') format('woff');
+								}
+								... and etc
+							</code>
+						</pre>
+        </section>
+        <section>
+          <h2>font-dispay: swap with preload</h2>
+          <pre style="white-space: pre-wrap;">
+						<code data-trim>
+							<link rel="preload" href="font-lato/lato-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
+						</code>
+					</pre>
+          <pre style="white-space: pre-wrap;">
+						<code data-trim>
+							@font-face {
+								font-family: Lato;
+								src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+								url('font-lato/lato-regular-webfont.woff') format('woff');
+								font-display: swap;
+							}
+							... and etc
+						</code>
+						</pre>
+        </section>
+      </section>
+      <section>
+        <h2>FOUT methods</h2>
+      </section>
+      <section>
+        <section>
+          <h2>FOUT with a Class</h2>
+          <p>simple css...</p>
+          <pre style="white-space: pre-wrap;">
+            						<code data-trim>
+            							@font-face {
+            								font-family: Lato;
+            								src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+            								url('font-lato/lato-regular-webfont.woff') format('woff');
+            							}
+            							... and etc
+            						</code>
+                      </pre>
+        </section>
+        <section>
+          <p>... with js</p>
+          <pre style="white-space: pre-wrap;"><code data-trim>
+                          (function() {
+                            // Optimization for Repeat Views
+                            if( sessionStorage.fontsLoadedFoutWithClass ) {
+                              document.documentElement.className += " fonts-loaded";
+                              return;
+                            }
+                            if( "fonts" in document ) {
+                              Promise.all([
+                                document.fonts.load("1em Lato"),
+                                document.fonts.load("700 1em Lato"),
+                                document.fonts.load("italic 1em Lato"),
+                                document.fonts.load("italic 700 1em Lato")
+                              ]).then(function () {
+                                document.documentElement.className += " fonts-loaded";
+                                // Optimization for Repeat Views
+                                sessionStorage.fontsLoadedFoutWithClass = true;
+                              });
+                            }
+                          })();
+                        </code></pre>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>FOUT</h2>
+          <p>very simple css without @font-face...</p>
+          <pre style="white-space: pre-wrap;"><code data-trim>
+                        body {
+                          font-family: Lato, sans-serif;
+                        }
+                  		</code></pre>
+        </section>
+        <section>
+          <p>... and some js</p>
+          <pre style="white-space: pre-wrap;"><code data-trim>
+                        (function() {
+                          if( "fonts" in document ) {
+                            var fontRoman = new FontFace("Lato", "url('font-lato/lato-regular-webfont.woff2') format('woff2'),url('font-lato/lato-regular-webfont.woff') format('woff')");
+                            var fontBold = new FontFace("Lato", "url('font-lato/lato-bold-webfont.woff2') format('woff2'),url('font-lato/lato-bold-webfont.woff') format('woff')", {weight: "700"});
+                            var fontItalic = new FontFace("Lato", "url('font-lato/lato-italic-webfont.woff2') format('woff2'),url('font-lato/lato-italic-webfont.woff') format('woff')", {style: "italic"});
+                            var fontBoldItalic = new FontFace("Lato", "url('font-lato/lato-bolditalic-webfont.woff2')format('woff2'),url('font-lato/lato-bolditalic-webfont.woff') format('woff')", {weight: "700", style: "italic"});
+                            Promise.all([
+                              fontRoman.load(),
+                              fontBold.load(),
+                              fontItalic.load(),
+                              fontBoldItalic.load()
+                            ]).then(function(loadedFonts) {
+                              // Render them at the same time
+                              loadedFonts.forEach(function(font) {
+                                document.fonts.add(font);
+                              });
+                            });
+                          }
+                        })();
+                      </code></pre>
+        </section>
+      </section>
+      <section>
+        <h2>FOFT methods</h2>
+      </section>
+      <section>
+        <section>
+          <h2>FOFT</h2>
+          <p>add preload in html...</p>
+          <pre style="white-space: pre-wrap;">
+          						<code data-trim>
+                        <link rel="preload" href="font-lato/lato-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
+          						</code>
+                    </pre>
+        </section>
+        <section>
+          <p>...use @font-face in css...</p>
+          <pre style="white-space: pre-wrap;">
+						<code data-trim>
+              @font-face {
+                font-family: LatoInitial;
+                src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+                url('font-lato/lato-regular-webfont.woff') format('woff');
+              }
+
+              @font-face {
+                font-family: Lato;
+                src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+                url('font-lato/lato-regular-webfont.woff') format('woff');
+              }
+              ... and etc
+
+              body {
+                font-family: sans-serif;
+              }
+              .fonts-loaded-1 body {
+                font-family: LatoInitial;
+              }
+              .fonts-loaded-2 body {
+                font-family: Lato;
+              }
+						</code>
+          </pre>
+          </section>
+          <section>
+            <p>... and js with any stages loading fonts</p>
+            <pre style="white-space: pre-wrap;"><code data-trim>
+              (function() {
+                if( "fonts" in document ) {
+                  // Optimization for Repeat Views
+                  if( sessionStorage.fontsLoadedFoft ) {
+                    document.documentElement.className += " fonts-loaded-2";
+                    return;
+                  }
+                  document.fonts.load("1em LatoInitial").then(function () {
+                    document.documentElement.className += " fonts-loaded-1";
+                    Promise.all([
+                      document.fonts.load("400 1em Lato"),
+                      document.fonts.load("700 1em Lato"),
+                      document.fonts.load("italic 1em Lato"),
+                      document.fonts.load("italic 700 1em Lato")
+                    ]).then(function () {
+                      document.documentElement.className += " fonts-loaded-2";
+                      // Optimization for Repeat Views
+                      sessionStorage.fontsLoadedFoft = true;
+                    });
+                  });
+                }
+              })();
+            </code></pre>
+          </section>
+      </section>
+      <section>
+        <section>
+          <h2>Critical FOFT</h2>
+          <p>css with subset roman web font @font-face...</p>
+          <pre style="white-space: pre-wrap;"><code data-trim>
+            @font-face {
+              font-family: LatoSubset;
+              src: url('font-lato/lato-zachleat-optimized.woff2') format('woff2'),
+              url('font-lato/lato-zachleat-optimized.woff') format('woff');
+              unicode-range: U+65-90, U+97-122;
+            }
+
+            @font-face {
+              font-family: Lato;
+              src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
+              url('font-lato/lato-regular-webfont.woff') format('woff');
+            }
+            ... and etc
+
+            body {
+              font-family: sans-serif;
+            }
+            .fonts-loaded-1 body {
+              font-family: LatoInitial;
+            }
+            .fonts-loaded-2 body {
+              font-family: Lato;
+            }
+      		</code></pre>
+        </section>
+        <section>
+          <p>... and some js</p>
+          <pre style="white-space: pre-wrap;"><code data-trim>
+            (function() {
+              if( "fonts" in document ) {
+                // Optimization for Repeat Views
+                if( sessionStorage.fontsLoadedCriticalFoft ) {
+                  // only stage 2 needed here, the subset isn’t needed anymore
+                  document.documentElement.className += " fonts-loaded-2";
+                  return;
+                }
+                document.fonts.load("1em LatoSubset").then(function () {
+                  document.documentElement.className += " fonts-loaded-1";
+                  Promise.all([
+                    document.fonts.load("400 1em Lato"),
+                    document.fonts.load("700 1em Lato"),
+                    document.fonts.load("italic 1em Lato"),
+                    document.fonts.load("italic 700 1em Lato")
+                  ]).then(function () {
+                    document.documentElement.className += " fonts-loaded-2";
+                    // Optimization for Repeat Views
+                    sessionStorage.fontsLoadedCriticalFoft = true;
+                  });
+                });
+              }
+            })();
+          </code></pre>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>Critical FOFT with Data URI</h2>
+          <p>Based into Critical FOFT, Just change for font-family: LatoSubset; url base-64 encoding font like this <pre style="white-space: pre-wrap;"><code data-trim>src: url('font-lato/lato-regular-webfont.woff2') format('woff2')</code></pre> into
+          <pre style="white-space: pre-wrap;"><code data-trim>src: url("data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAABVwAA0AAAAAG+Q...</code></pre>, on another like Critical
+          FOFT.</p>
+        </section>
+        <section>
+          <h2>Critical FOFT with preload</h2>
+          <p>Just add in Critical FOFT strategy HTML this code:</p>
+          <pre style="white-space: pre-wrap;"><code data-trim>
+              <link rel="preload" href="font-lato/lato-zachleat-optimized.woff2" as="font" type="font/woff2" crossorigin>
+            </code></pre>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>eBay/Amazon method:</h2>
+        </section>
+        <section>
+          <ol>
+            <li>Start out by loading your page using only system fonts.</li>
+            <li>Make an asynchronous request for the webfont so the browser caches it on disk for future use. Using libraries like
+              <a href="https://github.com/bramstein/fontfaceobserver">FontFaceObserver</a></li>
+            <li>After the async request has completed set a localStorage object indicating the font “should” now be cached on disk
+            </li>
+            <li>On the next page load, an inlined piece of JS checks if this localStorage object is present</li>
+          </ol>
+        </section>
+        <section>
+          <p>Look at this method <a href="https://github.com/eBay/ebay-font">eBay Font</a></p>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>Finaly</h2>
+        </section>
+        <section>
+          <p>If you’re looking for a quick and simple method you can have working within an hour, use Ebay’s method</p>
+        </section>
+        <section>
+          <p>If you want something a bit more thorough and are alright with the limited browser support for now, try using
+          `font-display: optional` or `font-display: swap` with service <a href="https://meowni.ca/font-style-matcher/">font style mather</a> for better
+          expirience</p>
+        </section>
+        <section>
+          <p>And if you really want to make an effort to optimize your webfont loading, take the dive and look into the
+          `localStorage` technique with any FOFT strategies.</p>
+        </section>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/reveal.js"></script>
+
+  <script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+      dependencies: [
+        { src: 'plugin/markdown/marked.js' },
+        { src: 'plugin/markdown/markdown.js' },
+        { src: 'plugin/notes/notes.js', async: true },
+        { src: 'plugin/highlight/highlight.js', async: true }
+      ]
+    });
+  </script>
+</body>
+
+</html>

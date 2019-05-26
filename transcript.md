@@ -1,5 +1,5 @@
 # Fonts Loading Strategy  
-
+ 
 1. Talk about problems for fonts loading.  
   Webfonts are one of the very first things we add to our sites—whether it be for individuality or stylistic reasons. Unfortunately, they are also infamous for making our sites painfully slow and frustrating to read. The end result? Frustrated users and lots of lost business opportunities. Thankfully they’ve been given lots of attention the last couple years. So let’s take a look at the three best ways for you to load your webfonts, but first let’s get everyone on the same page regarding everything that can and will go wrong with webfonts.  
   With no effective font loading strategy, users will experiment what’s call FOIT (Flash of Invisible Text) as the font files are downloading.  
@@ -18,210 +18,28 @@ Now that we know the font loading problems, let’s look at the font loading met
     Font failure period: If the font face is not loaded, the user agent treats it as a failed load causing normal font fallback.   
     swap - gives the font face an extremely small block period and an infinite swap period.  
     optional - gives the font face an extremely small block period and no swap period. 
-    At time of writing, this feature is available in the latest versions Edge, Firefox, Chrome, Safari and Opera, but is not available at mobile browsers.
-    ![CIU](CIU.png) 
-
+    At time of writing, this feature is available in the latest versions Edge, Firefox, Chrome, Safari and Opera, but is not available at mobile browsers.  
     For more information look at https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display and https://developers.google.com/web/updates/2016/02/font-display  
     Simple `@font-face`. Throw a naked @font-face block on your page and hope for the best. This is the default approach recommended by Google Fonts. Just add a CSS @font-face block with WOFF and WOFF2 formats or another formats if you need.
       - `font-dispay: swap`:
       Add a new font-display: swap descriptor to your @font-face block to opt-in to FOUT on browsers that support it. Optionally, font-display: fallback or font-display: optional can be used if you consider web fonts to be unnecessary to the design.
-          ```css
-          @font-face {
-            font-family: Lato;
-		        src: url('font-lato/lato-regular-webfont.woff2') format('woff2'), 
-            url('font-lato/lato-regular-webfont.woff') format('woff');
-		        font-display: swap;
-          }
-          ... and etc
-         ```
       - preload:  
       Just add `<link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin>` to fetch your font sooner.  
-          ```html
-          <link rel="preload" href="font-lato/lato-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
-          ```
-          ```css
-          @font-face {
-            font-family: Lato;
-		        src: url('font-lato/lato-regular-webfont.woff2') format('woff2'), 
-            url('font-lato/lato-regular-webfont.woff') format('woff');
-          }
-          ... and etc
-          ```
       - `font-dispay: swap` with preload. Pairs nicely with an previous simple `@font-face` block and feel free to also throw in the previous `font-display` descriptor as well for looking good. Just combine the two previous points, and be happy.
     - FOUT with a Class:  
     Use the CSS Font Loading API with a polyfill to detect when a specific font has loaded and only apply that web font in your CSS after it has loaded successfully. Usually this means toggling a class on your <html> element.   
-        ```css
-          @font-face {
-            font-family: Lato;
-		        src: url('font-lato/lato-regular-webfont.woff2') format('woff2'), 
-            url('font-lato/lato-regular-webfont.woff') format('woff');
-          }
-          ... and etc
-        ```
-        ```js
-            (function() {
-		          // Optimization for Repeat Views
-		          if( sessionStorage.fontsLoadedFoutWithClass ) {
-			          document.documentElement.className += " fonts-loaded";
-			          return;
-		          }
-		          if( "fonts" in document ) {
-			          Promise.all([
-				        document.fonts.load("1em Lato"),
-				        document.fonts.load("700 1em Lato"),
-				        document.fonts.load("italic 1em Lato"),
-				        document.fonts.load("italic 700 1em Lato")
-			          ]).then(function () {
-				        document.documentElement.className += " fonts-loaded";
-				        // Optimization for Repeat Views
-				        sessionStorage.fontsLoadedFoutWithClass = true;
-			          });
-		          }
-	          })();
-        ```
     - FOUT:  
     Similar to the above, but without using a class—using only the CSS Font Loading API. This doesn’t require any modification of the CSS, injects the web fonts using JS programmatically.  
-        ```css
-            body {
-		          font-family: Lato, sans-serif;
-	          }
-        ```
-        ```js
-          (function() {
-		        if( "fonts" in document ) {
-			        var fontRoman = new FontFace("Lato", "url('font-lato/lato-regular-webfont.woff2') format('woff2'),url('font-lato/lato-regular-webfont.woff') format('woff')");
-			        var fontBold = new FontFace("Lato", "url('font-lato/lato-bold-webfont.woff2') format('woff2'),url('font-lato/lato-bold-webfont.woff') format('woff')", {weight: "700"});
-			        var fontItalic = new FontFace("Lato", "url('font-lato/lato-italic-webfont.woff2') format('woff2'),url('font-lato/lato-italic-webfont.woff') format('woff')", {style: "italic"});
-			        var fontBoldItalic = new FontFace("Lato", "url('font-lato/lato-bolditalic-webfont.woff2') format('woff2'),url('font-lato/lato-bolditalic-webfont.woff') format('woff')", {weight: "700",	style: "italic"});
-			        Promise.all([
-				        fontRoman.load(),
-				        fontBold.load(),
-				        fontItalic.load(),
-				        fontBoldItalic.load()
-			        ]).then(function(loadedFonts) {
-				      // Render them at the same time
-				      loadedFonts.forEach(function(font) {
-					        document.fonts.add(font);
-				        });
-			        });
-		        }
-	        })();
-        ```
     - FOFT:  
     This approach builds on the FOUT with a Class method and is useful when you’re loading multiple weights or styles of the same typeface, e.g. roman, bold, italic, bold italic, book, heavy, and others. We split those web fonts into two stages: the roman first, which will then also immediately render faux-bold and faux-italic content (using font synthesis) while the real web fonts for heavier weights and alternative styles are loading. 
-        ```html
-          <link rel="preload" href="font-lato/lato-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
-        ```
-        ```css
-          @font-face {
-		        font-family: LatoInitial;
-		        src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
-				    url('font-lato/lato-regular-webfont.woff') format('woff');
-	        }
-
-	        @font-face {
-		        font-family: Lato;
-		        src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
-				    url('font-lato/lato-regular-webfont.woff') format('woff');
-	        }
-          ... and etc
-
-          body {
-		        font-family: sans-serif;
-	        }
-	        .fonts-loaded-1 body {
-		        font-family: LatoInitial;
-	        }
-	        .fonts-loaded-2 body {
-		        font-family: Lato;
-	        }
-        ```
-        ```js
-          (function() {
-	        	if( "fonts" in document ) {
-			      // Optimization for Repeat Views
-			        if( sessionStorage.fontsLoadedFoft ) {
-				        document.documentElement.className += " fonts-loaded-2";
-				        return;
-			        }
-			        document.fonts.load("1em LatoInitial").then(function () {
-				        document.documentElement.className += " fonts-loaded-1";
-				        Promise.all([
-					        document.fonts.load("400 1em Lato"),
-					        document.fonts.load("700 1em Lato"),
-					        document.fonts.load("italic 1em Lato"),
-					        document.fonts.load("italic 700 1em Lato")
-				        ]).then(function () {
-					        document.documentElement.className += " fonts-loaded-2";
-					        // Optimization for Repeat Views
-					        sessionStorage.fontsLoadedFoft = true;
-				        });
-			          });
-		          }
-	          })();
-        ```
     - Critical FOFT:  
-        The only difference between this method and standard FOFT approach is that instead of the full roman web font in the first stage, we use a subset roman web font (usually only containing A-Z and optionally 0-9 and/or punctuation). The full roman web font is instead loaded in the second stage with the other weights and styles.  
-        ```css
-          @font-face {
-		        font-family: LatoSubset;
-		        src: url('font-lato/lato-zachleat-optimized.woff2') format('woff2'),
-				    url('font-lato/lato-zachleat-optimized.woff') format('woff');
-		        unicode-range: U+65-90, U+97-122;
-	        }
-
-	        @font-face {
-		        font-family: Lato;
-		        src: url('font-lato/lato-regular-webfont.woff2') format('woff2'),
-				     url('font-lato/lato-regular-webfont.woff') format('woff');
-	        }
-          ... and etc
-
-          body {
-		        font-family: sans-serif;
-	        }
-	        .fonts-loaded-1 body {
-		        font-family: LatoInitial;
-	        }
-	        .fonts-loaded-2 body {
-		        font-family: Lato;
-	        }
-        ```
-        ```js
-          (function() {
-		        if( "fonts" in document ) {
-			      // Optimization for Repeat Views
-			        if( sessionStorage.fontsLoadedCriticalFoft ) {
-				        // only stage 2 needed here, the subset isn’t needed anymore
-				        document.documentElement.className += " fonts-loaded-2";
-				        return;
-			        }
-			        document.fonts.load("1em LatoSubset").then(function () {
-				        document.documentElement.className += " fonts-loaded-1";
-				        Promise.all([
-					        document.fonts.load("400 1em Lato"),
-					        document.fonts.load("700 1em Lato"),
-					        document.fonts.load("italic 1em Lato"),
-					        document.fonts.load("italic 700 1em Lato")
-				        ]).then(function () {
-					        document.documentElement.className += " fonts-loaded-2";
-					        // Optimization for Repeat Views
-					        sessionStorage.fontsLoadedCriticalFoft = true;
-				        });
-			        });
-		        }
-	        })();
-        ```
+        The only difference between this method and standard FOFT approach is that instead of the full roman web font in the first stage, we use a subset roman web font (usually only containing A-Z and optionally 0-9 and/or punctuation). The full roman web font is instead loaded in the second stage with the other weights and styles. 
     - Critical FOFT with Data URI:  
     This variation of the Critical FOFT approach simply changes the mechanism through which we load the first stage. Instead of using our normal font loading JavaScript API to initiate a download, we simply embed the web font as a inline Data URI directly in the markup.  
     Just change for `font-family: LatoSubset;` url base-64 encoding font like this `src: url('font-lato/lato-regular-webfont.woff2') format('woff2')` into 
     `src: url("data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAABVwAA0AAAAAG+Q...`, on another like Critical FOFT. This might sound like a lot of data to store but even 2-3 fonts encoded in this manner tend to stay under 100kb in size.
     - Critical FOFT with preload:  
-    This variation of the Critical FOFT approach simply changes the mechanism through which we load the first stage. Instead of using our normal font loading JavaScript API to initiate a download, we use the new preload web standard as described above in the preload method. This should trigger the download sooner than previously possible.  
-      Just add in Critical FOFT strategy HTML 
-      ```html
-        <link rel="preload" href="font-lato/lato-zachleat-optimized.woff2" as="font" type="font/woff2" crossorigin>
-      ```
+    This variation of the Critical FOFT approach simply changes the mechanism through which we load the first stage. Instead of using our normal font loading JavaScript API to initiate a download, we use the new preload web standard as described above in the preload method. This should trigger the download sooner than previously possible. Just add in Critical FOFT strategy HTML preload
     - Ebay/Amazon method:  
     This solution use the localStorage, FontFaceSet APIs and the Font Face Observer utility (as a backup if the FontFaceSet API is not present) with a polyfill.
     
