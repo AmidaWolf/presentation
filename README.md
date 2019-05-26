@@ -10,7 +10,7 @@
   Now for the last issue, which people don’t think about very often: Content Shifting. Ever been reading an article and 5-10 seconds into reading, the fonts change and everything on the page scrolls up?
 2. Talk about fonts loaing strategies.   
 Now that we know the font loading problems, let’s look at the font loading methods you can use to avoid these problems completely.
-    - Simple methods. Talk about `font-display`.  
+  - Simple methods. Talk about `font-display`.  
     The new font-display descriptor for @font-face lets developers decide how their web fonts will render (or fallback), depending on how long it takes for them to load.    
     The font display timeline is based on a timer that begins the moment the user agent attempts to use a given downloaded font face. The timeline is divided into the three periods below which dictate the rendering behavior of any elements using the font face.  
     Font block period: If the font face is not loaded, any element attempting to use it must render an invisible fallback font face. If the font face successfully loads during this period, it is used normally.  
@@ -22,7 +22,7 @@ Now that we know the font loading problems, let’s look at the font loading met
     ![CIU](CIU.png) 
 
     For more information look at https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display and https://developers.google.com/web/updates/2016/02/font-display  
-    Simple `@font-face`. Throw a naked @font-face block on your page and hope for the best. This is the default approach recommended by Google Fonts. Just add a CSS @font-face block with WOFF and WOFF2 formats or another formats if you need.
+    - Simple `@font-face`. Throw a naked @font-face block on your page and hope for the best. This is the default approach recommended by Google Fonts. Just add a CSS @font-face block with WOFF and WOFF2 formats or another formats if you need.
       - `font-dispay: swap`:
       Add a new font-display: swap descriptor to your @font-face block to opt-in to FOUT on browsers that support it. Optionally, font-display: fallback or font-display: optional can be used if you consider web fonts to be unnecessary to the design.
           ```css
@@ -48,7 +48,8 @@ Now that we know the font loading problems, let’s look at the font loading met
           ... and etc
           ```
       - `font-dispay: swap` with preload. Pairs nicely with an previous simple `@font-face` block and feel free to also throw in the previous `font-display` descriptor as well for looking good. Just combine the two previous points, and be happy.
-    - FOUT with a Class:  
+   - FOUT
+      - FOUT with a Class:  
     Use the CSS Font Loading API with a polyfill to detect when a specific font has loaded and only apply that web font in your CSS after it has loaded successfully. Usually this means toggling a class on your <html> element.   
         ```css
           @font-face {
@@ -79,7 +80,7 @@ Now that we know the font loading problems, let’s look at the font loading met
 		          }
 	          })();
         ```
-    - FOUT:  
+      - FOUT:  
     Similar to the above, but without using a class—using only the CSS Font Loading API. This doesn’t require any modification of the CSS, injects the web fonts using JS programmatically.  
         ```css
             body {
@@ -160,7 +161,7 @@ Now that we know the font loading problems, let’s look at the font loading met
 		          }
 	          })();
         ```
-    - Critical FOFT:  
+      - Critical FOFT:  
         The only difference between this method and standard FOFT approach is that instead of the full roman web font in the first stage, we use a subset roman web font (usually only containing A-Z and optionally 0-9 and/or punctuation). The full roman web font is instead loaded in the second stage with the other weights and styles.  
         ```css
           @font-face {
@@ -212,11 +213,11 @@ Now that we know the font loading problems, let’s look at the font loading met
 		        }
 	        })();
         ```
-    - Critical FOFT with Data URI:  
+      - Critical FOFT with Data URI:  
     This variation of the Critical FOFT approach simply changes the mechanism through which we load the first stage. Instead of using our normal font loading JavaScript API to initiate a download, we simply embed the web font as a inline Data URI directly in the markup.  
     Just change for `font-family: LatoSubset;` url base-64 encoding font like this `src: url('font-lato/lato-regular-webfont.woff2') format('woff2')` into 
     `src: url("data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAABVwAA0AAAAAG+Q...`, on another like Critical FOFT. This might sound like a lot of data to store but even 2-3 fonts encoded in this manner tend to stay under 100kb in size.
-    - Critical FOFT with preload:  
+      - Critical FOFT with preload:  
     This variation of the Critical FOFT approach simply changes the mechanism through which we load the first stage. Instead of using our normal font loading JavaScript API to initiate a download, we use the new preload web standard as described above in the preload method. This should trigger the download sooner than previously possible.  
       Just add in Critical FOFT strategy HTML 
       ```html
